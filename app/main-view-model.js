@@ -1,9 +1,20 @@
-var Observable = require("data/observable").Observable;
+const Observable = require("data/observable").Observable;
 
 // TODO: js-atom vs Observable 
 // const atom = require("js-atom");
 
 const db = require("./data/db.js");
+
+/**
+ * Constants
+ */
+
+const {TODO, DOING, DONE, ALL} = require("./data/constants.js");
+
+
+/**
+ * Functions
+ */
 
 function getMessage(counter) {
     if (counter <= 0) {
@@ -17,7 +28,7 @@ function createViewModel() {
     var viewModel = new Observable();
     viewModel.counter = 42;
     viewModel.message = getMessage(viewModel.counter);
-    viewModel.tasklist = db.tasklistFromFile();
+    viewModel.tasklist = db.tasks();
 
     viewModel.onTap = function() {
         this.counter--;

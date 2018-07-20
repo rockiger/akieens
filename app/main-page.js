@@ -21,7 +21,7 @@ function onNavigatingTo(args) {
     */
     var page = args.object;
     const model = mainViewModel.createViewModel();
-    console.log(model.tasklist);
+    //console.log(model.tasklist);
 
     /*
     A page’s bindingContext is an object that should be used to perform

@@ -1,45 +1,31 @@
-const fs = require("tns-core-modules/file-system");
+/**
+ * db modulie for writing and reading the global state in akiee
+ * @module data/db
+ */
 
-const org = require("./markdown-org-mode-parser.js");
 
 /**
- * 
- * @param {ListOfNode} lon 
- * @param {Node} node
- * @returns {String} the project name
+ * Module imports
  */
-function project (lon, node) {
-    let pr = "Inbox";
-    for (const n of lon) {
-        if (n.key === node.key) {
-            return pr;
-        } else if (n.level === 1) {
-            pr = n.headline;
-        }
-    }
-    return pr;
-}
+
+const node = require("./node.js");
 
 /**
- * consumes a task file markdown string and produces a list of nodes
- * @param {String} md the markdown
- * @returns lon 
+ * Constants
  */
-function mdToNodes(md) {
-    const nodes = org.parseBigString(md);
-    for (const n of nodes) {
-        if (n.level > 1) {
-            n.project = project(nodes, n);
-        } 
+
+const {TODO, DOING, DONE, ALL} = require("./constants.js");
+
+
+
+
+function tasks (ls="DOING") {
+    return tasksHelper(ls);
+
+    function tasksHelper(ls) {
+        return node.lonFromFile();
     }
-    return nodes;
 }
 
-function tasklistFromFile() {
-    const folder = fs.knownFolders.currentApp()
-    const fpath = fs.path.join(folder.path, "data", "liveflow.md");
-    const file = fs.File.fromPath(fpath);
-    return mdToNodes(file.readTextSync());
-}
 
-exports.tasklistFromFile = tasklistFromFile;
+exports.tasks = tasks;

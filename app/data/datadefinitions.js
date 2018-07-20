@@ -42,10 +42,10 @@ function fnForTaskState (ts) {
  * {rate: 1, unit: "daily"}
  * - rate: Integer how many units until the next repetition
  * - unit: String with one or more of daily, weekdayly, weekly, monthly, yearly
- * @type {Map}
+ * @type {object}
  * interp. as the intervall in which a task gets repeated
  */
-const R1 = new Map({rate: 1, unit: "daily"});
+const R1 = {rate: 1, unit: "daily"};
 function fnForRepeatInfo(r) {
     const rate = r.get(rate),
           unit = r.get(unit);
@@ -79,9 +79,9 @@ function fnForRepeatInfo(r) {
  *          created in markdown-org-mode; default null
  * - project: The name of the project corresponding project that 
  *            is one level higher, has to found out via a function
- * @type {Map}
+ * @type {object}
  */
-const N1 = new Map({
+const N1 = {
     key: "orgode_33.##",
     level: 2,
     headline: "As a user I want to change the state of a task with a simple action.",
@@ -99,13 +99,54 @@ const N1 = new Map({
     repeat: null,
     style: null,
     project: "Inbox"
-});
+};
+const N1a = {
+    key: "orgode_45.##",
+    level: 2,
+    headline: "As a user I want to change the state of a task with a simple action.",
+    body: "",
+    tag: null,
+    tags: {},
+    todo: "DOING",
+    priority: null,
+    scheduled: null,
+    deadline: null,
+    fin: null,
+    properties: {},
+    drawer: {},
+    rank: null,
+    repeat: null,
+    style: null,
+    project: "Inbox"
+};
+const N2 = {
+    key: "orgode_83.##",
+    level: 2,
+    headline: "Make it possible for users to create an account",
+    body: "",
+    tag: null,
+    tags: {},
+    todo: "DOING",
+    priority: null,
+    scheduled: null,
+    deadline: null,
+    fin: null,
+    properties: {},
+    drawer: {},
+    rank: null,
+    repeat: null,
+    style: null,
+    project: "Inbox"
+};
 function fnForNode(n) {
     /* ... */ n.get(todo) /* ... */
     /* ... */ n.get(rank) /* ... */
     /* ... */
 }
-
+// To make it usable for testing
+exports.N1 = N1;
+exports.N1a = N1a;
+exports.N2 = N2;
 
 /**
  * Rank is one of:
@@ -213,9 +254,9 @@ const SEL1 = null,
  * - String or nil Selected - the selected task
  * - ListState
  * - ~~ListOfNode~~ gets it own atom
- * @type {Map}
+ * @type {object}
  */
-const GS1 = new Map({
+const GS1 = {
     isEditor: false, 
     isSearch: false, 
     isEntry: false,
@@ -224,13 +265,13 @@ const GS1 = new Map({
     isSelected: null,
     isEditable: null,
     listState: ""
-});
+};
 
 
 /**
- * ConfState is a map
+ * ConfState consists of:
  * interp. as the persistant configuration, that can be set by the user-home
  * - TaskLocation "String that holds the path to the directory of liveflow.md"
- * @type {Map}
+ * @type {object}
  */
-const CS1 = new Map({taskLocation: ""});
+const CS1 = {taskLocation: ""};

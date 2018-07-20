@@ -30,7 +30,7 @@ const $debug$ = true;
 function checkExpect (obj1, obj2) {
     if ($debug$) {
         if (!_.isEqual(obj1, obj2)) {
-            console.log("\nDID'T CHECK:");
+            console.log("\nDIDN'T CHECK:");
             console.dir(obj1);
             console.log("is not equal to");
             console.dir(obj2);
@@ -38,5 +38,12 @@ function checkExpect (obj1, obj2) {
         }
     }
 }
-
 exports.checkExpect = checkExpect;
+
+
+function notEmpty(list) {
+    return !_.isEmpty(list);
+}
+checkExpect(notEmpty([]), false);
+checkExpect(notEmpty([1]), true);
+exports.notEmpty = notEmpty; 
