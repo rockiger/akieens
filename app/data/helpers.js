@@ -27,14 +27,16 @@ const $debug$ = true;
  * @param {obj1}
  * @param {obj2}
  */
-function checkExpect (obj1, obj2) {
+function checkExpect (obj1, obj2, msg='') {
     if ($debug$) {
         if (!_.isEqual(obj1, obj2)) {
-            console.log("\nDIDN'T CHECK:");
-            console.dir(obj1);
-            console.log("is not equal to");
-            console.dir(obj2);
-            console.dir();
+            const error = new Error();
+            //console.dir("caller is " + checkExpect.caller);
+            console.log("==============================")
+            console.log("Test:", msg, "failed.")
+            console.dir(obj1, "is not equal to", obj2);
+            console.log("called from:", _.last(error.stack.split("\n")[1].split("/")).slice(0, -1));
+            console.log("==============================")
         }
     }
 }
