@@ -4,6 +4,15 @@
  */
 
 
+/***********
+ * Exports *
+ ***********/
+
+exports.isNewerDate = isNewerDate;
+exports.tagsString = tagsString;
+exports.lonFromFile = lonFromFile;
+
+
 /******************
  * Module imports *
  ******************/
@@ -233,7 +242,7 @@ function lonToMd(lon) {
         str += n.level === 1 ? "# " : "## ";
         str += n.todo ? (n.todo + " ") : "";
         str += n.headline.trim();
-        str += notEmpty(n.tags) ? (":" + n.tags.join(":") + ":") : "";
+        str += notEmpty(n.tags) ? (":" + _.keys(n.tags).join(":") + ":") : "";
         str += "\n";
         str += notEmpty(n.body) ? (n.body + "\n") : "";
         str += n.rank ? ("RANK: " + n.rank + "\n") : "";
@@ -296,13 +305,13 @@ checkExpect(isNewerDate(new Date(2018, 1, 1), new Date(2018, 1, 1)), false);
  */
 function tagsString(n) {
     if (notEmpty(n.tags)) {
-        return n.tags.join(", ");
+        return _.keys(n.tags).join(", ");
     } else {
         return "";
     }
 }
-checkExpect(tagsString({headline: "node1", tags: []}), "");
-checkExpect(tagsString({headline: "node1", tags: ["tag1", "tag2", "tag3"]}), "tag1, tag2, tag3");
+checkExpect(tagsString({headline: "node1", tags: {}}), "");
+checkExpect(tagsString({headline: "node1", tags: {tag1: true, tag2: true, tag3: true}}), "tag1, tag2, tag3");
 
 
 
@@ -316,5 +325,3 @@ checkExpect(repsString({repeat: null}), "");
 checkExpect(repsString({repeat: {rate: 1, unit: "daily"}}), "1 daily");
 checkExpect(repsString({repeat: {rate: 2, unit: "daily"}}), "2 daily");
 checkExpect(repsString({repeat: {rate: 1, unit: ""}}), "");
-
-exports.lonFromFile = lonFromFile;
