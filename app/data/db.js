@@ -9,12 +9,14 @@
  ***********/
 
 exports.tasks = tasks;
+exports.noOfTasks = noOfTasks;
 
 
 /******************
  * Module imports *
  ******************/
 
+const fs = require("tns-core-modules/file-system");
 const atom = require("js-atom");
 const _ = require("underscore");
 const node = require("./node.js");
@@ -25,7 +27,7 @@ const {hasString, checkExpect, thread} = require("./helpers.js");
  * Constants *
  *************/
 
-const {TODO, DOING, DONE, ALL} = require("./constants.js");
+const {TODO, DOING, DONE, ALL, FOLDER, FILENAME} = require("./constants.js");
 
 
 /*********
@@ -46,7 +48,7 @@ const $appState$ = atom.createAtom({
 });
 
 const $taskList$ = atom.createAtom(
-    node.lonFromFile()
+    node.lonFromFile(fs.path.join(taskLocation(), FILENAME))
 );
 
 
@@ -116,24 +118,36 @@ function editable() {
  * @returns {ListOfNode}
  */
 function tasks() {
-    return tasksHelper($appState$.deref().searchString, $appState$.deref().listState);
+    return tasksHelper($appState$.deref().searchString, 
+                       $appState$.deref().listState,
+                       $taskList$.deref());
 }
 
 /**
- * Consumes the search string and the state of the list and produces
- * the tasks to show.
+ * Consumes the search string, state of the list and the list
+ * and produces the tasks to show.
  * @param {string} ss - the search string
- * @param {ListState} ls
+ * @param {ListState} ls - the list state
+ * @param {ListOfNode} lon - the list of tasks
  * @return {ListOfNode} - the tasks to show t.level === 2
  */
-function tasksHelper(ss, ls) {    
-    return thread("->", $taskList$.deref(),
+function tasksHelper(ss, ls, tasklist) {    
+    return thread("->", tasklist,
             [_.filter, filterTasks],
             [_.filter, x => filterState(x, ls)],
             [_.filter, x => filterSearch(x, ss)],
             max100); 
 }
-
+const _lon = [{level: 2, todo: TODO, headline: "foo", tags: {a: true, bar: true, c: true}, 
+               project: "baz", rank: 4, fin: "<2018-8-28>"},
+              {level: 2, todo: DOING, headline: "fooo", tags: {a: true, barr: true, c: true}, 
+               project: "bazz", rank: 1, fin: "<2018-8-29>"},
+              {level: 2, todo: TODO, headline: "foooo", tags: {a: true, barrr: true, c: true}, 
+               project: "bazzz", rank: 3, fin: "<2018-8-30>"},
+              {level: 1, todo: null, headline: "bazzz", tags: {}, fin: null}]
+checkExpect(tasksHelper("", DOING, _lon), 
+            [{level: 2, todo: DOING, headline: "fooo", tags: {a: true, barr: true, c: true}, 
+              project: "bazz", rank: 1, fin: "<2018-8-29>"}])
 /**
  * Decides if a Node is a Task
  * @param {Node} x 
@@ -182,10 +196,10 @@ function filterSearch(x, ss) {
         }
     }
 }
-checkExpect(filterSearch({headline: "foo", tags: "a:bar:c", project: "baz"}, "foo"), true);
-checkExpect(filterSearch({headline: "bar", tags: "a:bar:c", project: "baz"}, "bar"), true);
-checkExpect(filterSearch({headline: "foo", tags: "a:bar:c", project: "baz"}, "baz"), true);
-checkExpect(filterSearch({headline: "foo", tags: "a:bar:c", project: "baz"}, "qux"), false);
+checkExpect(filterSearch({headline: "foo", tags: {a: true, bar: true, c: true}, project: "baz"}, "foo"), true);
+checkExpect(filterSearch({headline: "bar", tags: {a: true, bar: true, c: true}, project: "baz"}, "bar"), true);
+checkExpect(filterSearch({headline: "foo", tags: {a: true, bar: true, c: true}, project: "baz"}, "baz"), true);
+checkExpect(filterSearch({headline: "foo", tags: {a: true, bar: true, c: true}, project: "baz"}, "qux"), false);
 
 
 /**
@@ -211,17 +225,89 @@ function sortTasks(lon, ls) {
         return toSort.sort((a,b) => a.rank - b.rank);
     }
 }
-const lon = [{rank: 4, fin: "<2018-8-28>"},
+const _lon1 = [{rank: 4, fin: "<2018-8-28>"},
              {rank: 1, fin: "<2015-5-11>"},
              {rank: 7, fin: "<2016-5-14>"}];
-checkExpect(sortTasks(lon, TODO),
+checkExpect(sortTasks(_lon1, TODO),
             [{rank: 1, fin: "<2015-5-11>"},
              {rank: 4, fin: "<2018-8-28>"},
              {rank: 7, fin: "<2016-5-14>"}],
             "sortTasks() with rank")
-checkExpect(sortTasks(lon, DONE),
+checkExpect(sortTasks(_lon1, DONE),
             [{rank: 4, fin: "<2018-8-28>"},
              {rank: 7, fin: "<2016-5-14>"},
              {rank: 1, fin: "<2015-5-11>"}],
             "sortTasks() with date");
 // End tasks and helper functions
+
+/**
+ * Produces an object with the number of the corresponding task states
+ * @return {object}
+ */
+function noOfTasks() {
+    const tasks = $taskList$.deref();
+    return {
+        ALL: noOfTasksHelper(ALL, tasks),
+        TODO: noOfTasksHelper(TODO, tasks),
+        DOING: noOfTasksHelper(DOING, tasks),
+        DONE: noOfTasksHelper(DONE, tasks)
+    }
+}
+
+/**
+ * Counts the task with a certain state in a given ListOfNode
+ * @param {ListState} ls 
+ * @param {ListOfNode} lon
+ * @returns {number}
+ */
+function noOfTasksHelper(lon, ls) {
+    const ft = _.filter(lon, filterTasks);
+    const fs = _.filter(ft, x => filterState(x, ls));
+    return fs.length;
+}            
+checkExpect(noOfTasksHelper(_lon, ALL), 3);
+checkExpect(noOfTasksHelper(_lon, TODO), 2);
+checkExpect(noOfTasksHelper([], TODO), 0);
+
+
+/**
+ * Produces the sorted list of projects
+ * @returns {Array<string>} - the list of projects
+ */
+function projects() {
+    return projectsHelper($taskList$.deref());
+}
+
+/**
+ * Produces a list of projects in a ListOfNode
+ * @param {ListOfNode} lon 
+ * @returns {Array<string>}
+ */
+function projectsHelper(lon) {
+    //console.log(lon);
+    const projects = _.filter(lon, x => (x.level === 1) ? true : false);
+    const projectNames = projects.map(x => x.headline);
+    return projectNames.sort();
+}
+const _lon2 = [{level: 1, todo: null, headline: "foo", tags: {}, fin: null},
+               {level: 2, todo: TODO, headline: "foo", tags: {a: true, bar: true, c: true}, 
+                project: "baz", rank: 4, fin: "<2018-8-28>"},
+               {level: 2, todo: DOING, headline: "fooo", tags: {a: true, barr: true, c: true}, 
+                project: "bazz", rank: 1, fin: "<2018-8-29>"},
+               {level: 1, todo: null, headline: "bazzz", tags: {}, fin: null},
+               {level: 2, todo: TODO, headline: "foooo", tags: {a: true, barrr: true, c: true}, 
+                project: "bazzz", rank: 3, fin: "<2018-8-30>"},
+               {level: 1, todo: null, headline: "bar", tags: {}, fin: null}]
+checkExpect(projectsHelper(_lon2), ["bar", "bazzz", "foo"]);
+
+
+/**
+ * Returns the path to the folder where the task files are stored
+ */
+function taskLocation() {
+    const folder = fs.knownFolders.currentApp()
+    const fpath = fs.path.join(folder.path, FOLDER);
+    return fpath;
+}
+
+// TODO Functions that change the state

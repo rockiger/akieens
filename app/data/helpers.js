@@ -25,7 +25,7 @@ const _ = require("underscore");
  * Constants *
  *************/
 
-const $debug$ = true;
+const DEBUG = true;
 
 
 /*************
@@ -38,14 +38,16 @@ const $debug$ = true;
  * @param {obj2}
  */
 function checkExpect (obj1, obj2, msg='') {
-    if ($debug$) {
+    if (DEBUG) {
         if (!_.isEqual(obj1, obj2)) {
             const error = new Error();
             //console.dir("caller is " + checkExpect.caller);
             console.log("==============================")
             console.log("Test:", msg, "failed.")
-            console.log(obj1, "\nis not equal to\n", obj2);
-            console.log("called from:", _.last(error.stack.split("\n")[1].split("/")).slice(0, -1));
+            console.log(obj1)
+            console.log("is not equal to")
+            console.log(obj2);
+            console.log("called from:", _.last(error.stack.split("\n")[2].split("/")).slice(0, -1));
             console.log("==============================")
         }
     }

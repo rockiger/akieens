@@ -209,13 +209,11 @@ function mdToLon(md) { // function name was toNodesFromMd
 /**
  * TODO Consumes the path p to the task file and produces a list of nodes
  * TODO find way to test, without :key
- * TODO @param {String} - path
+ * @param {String} - path
  * @returns {ListOfNode}
  * TODO finish, when fileoperations module is created
  */
-function lonFromFile() {
-    const folder = fs.knownFolders.currentApp()
-    const fpath = fs.path.join(folder.path, "data", "liveflow.md");
+function lonFromFile(fpath) {
     const file = fs.File.fromPath(fpath);
     return mdToLon(file.readTextSync());
 }

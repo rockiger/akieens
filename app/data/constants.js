@@ -3,7 +3,7 @@
  * @module data/constants
  */
 
- 
+
 /**
  *  @constant
  *  @type {string}
@@ -34,8 +34,21 @@ const ALL = "ALL";
  */
 const FILENAME = "liveflow.md";
 
+
+/**
+ * @constant
+ * @type {string}
+ */
+const FOLDER = "data";
+
+
+/***********
+ * Exports *
+ ***********/
+
 exports.TODO = TODO;
 exports.DONE = DONE;
 exports.DOING = DOING;
 exports.ALL = ALL;
 exports.FILENAME = FILENAME;
+exports.FOLDER = FOLDER;
