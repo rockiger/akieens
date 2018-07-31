@@ -10,6 +10,10 @@
 
 exports.tasks = tasks;
 exports.noOfTasks = noOfTasks;
+exports.observeAppState = observeAppState;
+exports.unobserveAppState = unobserveAppState;
+exports.switchListState = switchListState;
+exports.listState = listState;
 
 
 /******************
@@ -55,6 +59,28 @@ const $taskList$ = atom.createAtom(
 /*************
  * Functions *
  *************/
+
+/**
+ * Adds a function that will be called whenever the AppState changes. 
+ * The callback is called with four arguments whenever the state changes.
+ * @param {string} key - the key is just a string identifying this observer (needed for unobserving)
+ * @param {function} fn - the function is called with four arguments whenever the state changes e.g. function ("watch", (key, ref, old, nw) => {}):
+ *  - key - the key used to register the watcher
+ *  - ref - the reference to the state
+ *  - old - the previous value
+ *  - nw - the new value
+ */
+function observeAppState(key, fn) {
+    $appState$.addWatch(key, fn);
+}
+
+/**
+ * Removes the previously added watcher from the AppState.
+ * @param {string} key - the previously added watcher
+ */
+function unobserveAppState(key) {
+    $appState$.removeWatch(key);
+}
 
 /**
  * Consume a Task-Location directory and produces a new GlobalState with new tasks
@@ -311,3 +337,16 @@ function taskLocation() {
 }
 
 // TODO Functions that change the state
+
+/**
+ * Consumes a Liststate and changes the AppState accordingly.
+ * @param {ListState} ls 
+ */
+function switchListState(ls) {
+    const old = $appState$.deref();
+    const nw = {
+        ...old,
+        listState: ls
+    };
+    $appState$.reset(nw);
+}

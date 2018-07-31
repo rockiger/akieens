@@ -1,17 +1,19 @@
-/*
-In NativeScript, a file with the same name as an XML file is known as
-a code-behind file. The code-behind is a great place to place your view
-logic, and to set up your page’s data binding.
-*/
+/* code-behind file for main-page.xml */
 
-/*
-NativeScript adheres to the CommonJS specification for dealing with
-JavaScript modules. The CommonJS require() function is how you import
-JavaScript modules defined in other files.
-*/ 
+
+/******************
+ * Module imports *
+ ******************/
+
 const mainViewModel = require("./main-view-model");
-const fs = require("tns-core-modules/file-system");
+const db = require("./data/db.js");
 
+/*************
+ * Constants *
+ *************/
+
+const {TODO, DOING, DONE} = require("./data/constants.js");
+const TOOLBARINDEX = {TODO: 0, DOING: 1, DONE: 2};
 
 function onNavigatingTo(args) {
     /*
@@ -19,28 +21,46 @@ function onNavigatingTo(args) {
     view the API reference of the Page to see what’s available at
     https://docs.nativescript.org/api-reference/classes/_ui_page_.page.html
     */
-    var page = args.object;
-    const model = mainViewModel.createViewModel();
-    //console.log(model.tasklist);
+    const page = args.object;
+    const toolbar = page.getViewById("toolbar");
+    db.observeAppState("main-page", 
+        (key, ref, old, nw) => updateMainPage(key, ref, old, nw, page));
+    
+    db.switchListState(DOING);
+    
+    toolbar.on("selectedIndexChange", onselectedIndexChange);
+}
 
-    /*
-    A page’s bindingContext is an object that should be used to perform
-    data binding between XML markup and JavaScript code. Properties
-    on the bindingContext can be accessed using the {{ }} syntax in XML.
-    In this example, the {{ message }} and {{ onTap }} bindings are resolved
-    against the object returned by createViewModel().
 
-    You can learn more about data binding in NativeScript at
-    https://docs.nativescript.org/core-concepts/data-binding.
-    */
+function onNavigatingFrom(args) {
+    db.unobserveAppState("main-page")
+}
 
-    var tasks = page.getViewById("tasks");
-    let toolbar = page.getViewById("toolbar");
-    const DOING = 1;
 
-    tasks.items = model.tasklist;
+function onselectedIndexChange(args) {
+    const selectedIndex = args.object.selectedIndex;
+    switch (selectedIndex) {
+        case 0:
+            db.switchListState(TODO); 
+            break;
 
-    toolbar.selectedIndex = DOING;
+        case 1:
+            db.switchListState(DOING); 
+            break;
+
+        case 2:
+            db.switchListState(DONE); 
+            break;
+    }
+}
+
+/* Callback if the AppState changes */
+function updateMainPage(key, ref, old, nw, page) {
+    const tasks = page.getViewById("tasks");
+    const toolbar = page.getViewById("toolbar");
+
+    tasks.items = db.tasks();
+    toolbar.selectedIndex = TOOLBARINDEX[db.listState()];
 }
 
 /*
@@ -50,3 +70,4 @@ function here makes the navigatingTo="onNavigatingTo" binding in this page’s X
 file work.
 */
 exports.onNavigatingTo = onNavigatingTo;
+exports.onNavigatingFrom = onNavigatingFrom;
