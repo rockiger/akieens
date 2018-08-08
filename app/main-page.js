@@ -54,13 +54,19 @@ function onselectedIndexChange(args) {
     }
 }
 
-/* Callback if the AppState changes */
+/* Callback when the AppState changes */
 function updateMainPage(key, ref, old, nw, page) {
     const tasks = page.getViewById("tasks");
     const toolbar = page.getViewById("toolbar");
 
     tasks.items = db.tasks();
     toolbar.selectedIndex = TOOLBARINDEX[db.listState()];
+}
+
+
+/* Callback when a task is swiped */
+function onSwipeLabel(args) {
+    console.log("Swipe Direction: " + args.direction);
 }
 
 /*
@@ -71,3 +77,4 @@ file work.
 */
 exports.onNavigatingTo = onNavigatingTo;
 exports.onNavigatingFrom = onNavigatingFrom;
+exports.onSwipeLabel = onSwipeLabel;
