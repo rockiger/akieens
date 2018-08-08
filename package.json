@@ -6,13 +6,13 @@
   "nativescript": {
     "id": "org.nativescript.akieens",
     "tns-android": {
-      "version": "4.1.3"
+      "version": "4.2.0"
     }
   },
   "dependencies": {
     "js-atom": "^0.4.0",
     "nativescript-theme-core": "~1.0.4",
-    "tns-core-modules": "~4.1.0",
+    "tns-core-modules": "^4.2.0",
     "underscore": "^1.9.1"
   },
   "devDependencies": {
