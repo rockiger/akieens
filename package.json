@@ -12,6 +12,7 @@
   "dependencies": {
     "js-atom": "^0.4.0",
     "nativescript-theme-core": "~1.0.4",
+    "nativescript-ui-listview": "^3.5.11",
     "tns-core-modules": "^4.2.0",
     "underscore": "^1.9.1"
   },
