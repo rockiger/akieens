@@ -4,7 +4,7 @@ of which NativeScript renders with a platform-specific iOS or Android native con
 You can find a full list of user interface components you can use in your app at
 https://docs.nativescript.org/ui/components.
 -->
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" class="page">
+<Page xmlns="http://schemas.nativescript.org/tns.xsd" navigatingTo="onNavigatingTo" class="page" xmlns:lv="nativescript-ui-listview">
     <!--
     The ActionBar is the NativeScript common abstraction over the Android ActionBar and iOS NavigationBar.
     http://docs.nativescript.org/ui/action-bar
@@ -32,12 +32,38 @@ https://docs.nativescript.org/ui/components.
                 <SegmentedBarItem title="Done" />
             </SegmentedBar.items>
         </SegmentedBar>
-        <ListView id="tasks" row="5" itemTap="secondListViewItemTap" class="list-group">
-            <ListView.itemTemplate>
-                <StackLayout class="list-group-item">
-                    <Label text="{{ headline || 'Downloading...' }}" textWrap="true" class="title" swipe="onSwipeLabel" />
+
+        <lv:RadListView 
+            id="tasks" 
+            row="5" 
+            itemTap="secondListViewItemTap" 
+            class="list-group" 
+            swipeActions="true"
+            itemSwipeProgressEnded="onSwipeCellFinished"
+            itemSwipeProgressStarted="onSwipeCellStarted" 
+            itemSwipeProgressChanged="onSwipeCellProgressChanged"
+            itemSwiping="onItemSwiping" >
+            
+            <lv:RadListView.itemTemplate>
+                <!-- background-color: white is necessary, otherwise the
+                itemSwipeTemplate shines through -->
+                <StackLayout class="list-group-item" style="background-color: white;" paddingLeft="5">
+                    <Label style="width: 100%" text="{{ headline }}" textWrap="true" class="title" />
                 </StackLayout>
-            </ListView.itemTemplate>
-        </ListView>
+            </lv:RadListView.itemTemplate>
+            
+             <lv:RadListView.itemSwipeTemplate>
+                <GridLayout columns="auto, *, auto" backgroundColor="White" style="width: 200%;">
+                    <StackLayout id="left" col="0" style="background-color: blue;" tap="onLeftSwipeClick" paddingLeft="16" paddingRight="16" orientation="horizontal">
+                        <Label id="left-label" text="-> DONE" verticalAlignment="center" horizontalAlignment="center"/>
+                    </StackLayout>
+                    
+                    <StackLayout id="right" col="2" style="background-color: red;" tap="onRightSwipeClick"  paddingLeft="16" paddingRight="16" orientation="horizontal">
+                        <Label id="right-label" text="-> TODO" verticalAlignment="center" horizontalAlignment="center" />
+                    </StackLayout>
+                </GridLayout>
+            </lv:RadListView.itemSwipeTemplate>
+
+        </lv:RadListView>
     </StackLayout>
 </Page>
