@@ -12,7 +12,6 @@ const mainViewModel = require("./main-view-model");
 const db = require("./data/db.js");
 
 
-console.log(utils)
 /*************
  * Constants *
  *************/
@@ -43,6 +42,8 @@ function onNavigatingTo(args) {
     const toolbar = page.getViewById("toolbar");
     db.observeAppState("main-page", 
         (key, ref, old, nw) => updateMainPage(key, ref, old, nw, page));
+    db.observeTaskList("main-page",     
+        (key, ref, old, nw) => updateTaskList(key, ref, old, nw, page));
     
     db.switchListState(DOING);
     
@@ -81,6 +82,13 @@ function updateMainPage(key, ref, old, nw, page) {
     toolbar.selectedIndex = TOOLBARINDEX[db.listState()];
 }
 
+
+/* Callback when the taskList changes */
+function updateTaskList(key, ref, old, nw, page) {
+    const tasks = page.getViewById("tasks");
+
+    tasks.items = db.tasks();
+}
 
 /* Functions to handle swiping of tasks */
 
@@ -160,9 +168,12 @@ function onSwipeCellFinished (args) {
     const rightItem = swipeView.getViewById('right');
 
     if ($leftThresholdPassed$.deref()) {
-        console.log("Perform left action");
+        console.log(leftItem['data-key']); // from DOING to DONE
+        // next-ts
+        db.setNextTaskState(leftItem['data-key']);
     } else if ($rightTresholdPassed$.deref()) {
-        console.log("Perform rigt action");
+        console.log("Perform rigt action"); // from DOING to TODO
+        // prev-ts
     }
 
     $leftThresholdPassed$.reset(false);

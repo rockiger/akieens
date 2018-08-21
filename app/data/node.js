@@ -215,7 +215,7 @@ function mdToLon(md) { // function name was toNodesFromMd
  */
 function lonFromFile(fpath) {
     const file = fs.File.fromPath(fpath);
-    return mdToLon(file.readTextSync());
+    return mdToLon(file.readTextSync()) ;
 }
 
 

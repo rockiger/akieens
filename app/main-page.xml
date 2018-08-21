@@ -53,12 +53,12 @@ https://docs.nativescript.org/ui/components.
             </lv:RadListView.itemTemplate>
             
              <lv:RadListView.itemSwipeTemplate>
-                <GridLayout columns="auto, *, auto" backgroundColor="White" style="width: 200%;">
-                    <StackLayout id="left" col="0" style="background-color: blue;" tap="onLeftSwipeClick" paddingLeft="16" paddingRight="16" orientation="horizontal">
+                <GridLayout columns="auto, *, auto" backgroundColor="White" style="width: 200%;" data-key="{{ key }}">
+                    <StackLayout data-key="{{ key }}" id="left" col="0" style="background-color: blue;" tap="onLeftSwipeClick" paddingLeft="16" paddingRight="16" orientation="horizontal">
                         <Label id="left-label" text="-> DONE" verticalAlignment="center" horizontalAlignment="center"/>
                     </StackLayout>
                     
-                    <StackLayout id="right" col="2" style="background-color: red;" tap="onRightSwipeClick"  paddingLeft="16" paddingRight="16" orientation="horizontal">
+                    <StackLayout data-key="{{ key }}" id="right" col="2" style="background-color: red;" tap="onRightSwipeClick"  paddingLeft="16" paddingRight="16" orientation="horizontal">
                         <Label id="right-label" text="-> TODO" verticalAlignment="center" horizontalAlignment="center" />
                     </StackLayout>
                 </GridLayout>

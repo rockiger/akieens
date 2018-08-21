@@ -14,6 +14,9 @@ exports.observeAppState = observeAppState;
 exports.unobserveAppState = unobserveAppState;
 exports.switchListState = switchListState;
 exports.listState = listState;
+exports.setNextTaskState = setNextTaskState;
+exports.observeTaskList = observeTaskList;
+exports.unobserveTaskList = unobserveTaskList;
 
 
 /******************
@@ -32,6 +35,8 @@ const {hasString, checkExpect, thread} = require("./helpers.js");
  *************/
 
 const {TODO, DOING, DONE, ALL, FOLDER, FILENAME} = require("./constants.js");
+const NEXT_STATE = Object.freeze({TODO: DOING, DOING: DONE, DONE: TODO});
+const PREV_STATE = Object.freeze({TODO: DONE, DOING: TODO, DONE: DOING});
 
 
 /*********
@@ -75,11 +80,33 @@ function observeAppState(key, fn) {
 }
 
 /**
+ * Adds a function that will be called whenever the taskList changes. 
+ * The callback is called with four arguments whenever the state changes.
+ * @param {string} key - the key is just a string identifying this observer (needed for unobserving)
+ * @param {function} fn - the function is called with four arguments whenever the state changes e.g. function ("watch", (key, ref, old, nw) => {}):
+ *  - key - the key used to register the watcher
+ *  - ref - the reference to the state
+ *  - old - the previous value
+ *  - nw - the new value
+ */
+function observeTaskList(key, fn) {
+    $taskList$.addWatch(key, fn);
+}
+
+/**
  * Removes the previously added watcher from the AppState.
  * @param {string} key - the previously added watcher
  */
 function unobserveAppState(key) {
     $appState$.removeWatch(key);
+}
+
+/**
+ * Removes the previously added watcher from the taskList.
+ * @param {string} key - the previously added watcher
+ */
+function unobserveTaskList(key) {
+    $taskList$.removeWatch(key);
 }
 
 /**
@@ -336,6 +363,26 @@ function taskLocation() {
     return fpath;
 }
 
+/**
+ * Returns the position of the first of occurence of a node with key ky in ListOfNode lon
+ * @param {String} ky 
+ * @param {ListOfNode} lon 
+ */
+function nodePosByKey(ky, lon) {
+    for (let n = 0; n < lon.length; n++) {
+        const element = lon[n];
+        if (element.key === ky) {
+            return n;
+        }
+    }
+    return -1
+}
+checkExpect(nodePosByKey("euritna", [{key: "node_1"}, {key: "node_2"}, {key: "orgnode_33.##"}]), -1)
+checkExpect(nodePosByKey("node_1", [{key: "node_1"}, {key: "node_2"}, {key: "orgnode_33.##"}]), 0)
+checkExpect(nodePosByKey("node_2", [{key: "node_1"}, {key: "node_2"}, {key: "orgnode_33.##"}]), 1)
+checkExpect(nodePosByKey("orgnode_33.##", [{key: "node_1"}, {key: "node_2"}, {key: "orgnode_33.##"}]), 2)
+// TODO tests
+
 // TODO Functions that change the state
 
 /**
@@ -349,4 +396,31 @@ function switchListState(ls) {
         listState: ls
     };
     $appState$.reset(nw);
+}
+
+/**
+ * Consumes a key and changes the task-state to the next of given task in $taskList$
+ * @param {TaskState} ky 
+ * @return lon - the new
+ */
+function setNextTaskState(ky) {
+    const lon = nodes(),
+          pos = nodePosByKey(ky, lon), //!!
+          nd = lon[pos],
+          oldTs = nd["todo"],
+          newTs = NEXT_STATE[oldTs];
+
+    nd["todo"] = newTs;
+    lon[pos] = nd;
+
+    reset($taskList$, lon);
+
+    return lon;
+}
+
+function reset(atom, lon) {
+    // TODO freeze object
+    atom.reset(lon);
+    // write atom to file
+    return lon
 }
