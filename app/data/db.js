@@ -15,6 +15,7 @@ exports.unobserveAppState = unobserveAppState;
 exports.switchListState = switchListState;
 exports.listState = listState;
 exports.setNextTaskState = setNextTaskState;
+exports.setPrevTaskState = setPrevTaskState;
 exports.observeTaskList = observeTaskList;
 exports.unobserveTaskList = unobserveTaskList;
 
@@ -399,16 +400,38 @@ function switchListState(ls) {
 }
 
 /**
- * Consumes a key and changes the task-state to the next of given task in $taskList$
+ * Consumes a key and changes the task-state to the next state of given task in $taskList$
  * @param {TaskState} ky 
  * @return lon - the new
  */
 function setNextTaskState(ky) {
+    return setTaskState(ky, NEXT_STATE);
+}
+
+
+/**
+ * Consumes a key and changes the task-state to the previos state of given task in $taskList$
+ * @param {TaskState} ky 
+ * @return lon - the new
+ */
+function setPrevTaskState(ky) {
+    return setTaskState(ky, PREV_STATE);
+}
+
+
+/**
+ * Consumes a key and changes the task-state to the new state of given task in $taskList$
+ * according to newStates
+ * @param {TaskState} ky 
+ * @param {object} newStates - dictionary to choose the right new state, e.g. NEXT_STATE
+ * @return lon - the new
+ */
+function setTaskState(ky, newStates) {
     const lon = nodes(),
           pos = nodePosByKey(ky, lon), //!!
           nd = lon[pos],
           oldTs = nd["todo"],
-          newTs = NEXT_STATE[oldTs];
+          newTs = newStates[oldTs];
 
     nd["todo"] = newTs;
     lon[pos] = nd;
@@ -421,6 +444,6 @@ function setNextTaskState(ky) {
 function reset(atom, lon) {
     // TODO freeze object
     atom.reset(lon);
-    // write atom to file
+    // todo write atom to file
     return lon
 }

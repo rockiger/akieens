@@ -174,6 +174,7 @@ function onSwipeCellFinished (args) {
     } else if ($rightTresholdPassed$.deref()) {
         console.log("Perform rigt action"); // from DOING to TODO
         // prev-ts
+        db.setPrevTaskState(rightItem['data-key']);
     }
 
     $leftThresholdPassed$.reset(false);
