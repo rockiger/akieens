@@ -11,6 +11,8 @@
 exports.isNewerDate = isNewerDate;
 exports.tagsString = tagsString;
 exports.lonFromFile = lonFromFile;
+exports.lonToMd = lonToMd;
+exports.fileFromMd = fileFromMd;
 
 
 /******************
@@ -216,6 +218,12 @@ function mdToLon(md) { // function name was toNodesFromMd
 function lonFromFile(fpath) {
     const file = fs.File.fromPath(fpath);
     return mdToLon(file.readTextSync()) ;
+}
+
+
+function fileFromMd(fpath, md) {
+    const file = fs.File.fromPath(fpath);
+    file.writeTextSync(md);
 }
 
 

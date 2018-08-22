@@ -1,5 +1,5 @@
 /**
- * db modulie for writing and reading the global state in akiee
+ * db module for writing and reading the global state in akiee
  * @module data/db
  */
 
@@ -60,6 +60,9 @@ const $appState$ = atom.createAtom({
 const $taskList$ = atom.createAtom(
     node.lonFromFile(fs.path.join(taskLocation(), FILENAME))
 );
+observeTaskList("writefile", (key, ref, old, nw) => {
+    node.fileFromMd(fs.path.join(taskLocation(), FILENAME), node.lonToMd(nw));
+})
 
 
 /*************
@@ -444,6 +447,5 @@ function setTaskState(ky, newStates) {
 function reset(atom, lon) {
     // TODO freeze object
     atom.reset(lon);
-    // todo write atom to file
     return lon
 }
