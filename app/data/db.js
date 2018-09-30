@@ -28,7 +28,7 @@ const fs = require("tns-core-modules/file-system");
 const atom = require("js-atom");
 const _ = require("underscore");
 const node = require("./node.js");
-const {hasString, checkExpect, thread} = require("./helpers.js");
+const {hasString, checkExpect} = require("./helpers.js");
 
 
 /*************
@@ -189,11 +189,14 @@ function tasks() {
  * @return {ListOfNode} - the tasks to show t.level === 2
  */
 function tasksHelper(ss, ls, tasklist) {    
-    return thread("->", tasklist,
-            [_.filter, filterTasks],
-            [_.filter, x => filterState(x, ls)],
-            [_.filter, x => filterSearch(x, ss)],
-            max100); 
+    let filteredTasks = tasklist;
+    filteredTasks = _.filter(filteredTasks, filterTasks);
+    filteredTasks = _.filter(filteredTasks, x => filterState(x, ls));
+    filteredTasks = _.filter(filteredTasks, x => filterSearch(x, ss));
+    filteredTasks = max100(filteredTasks);
+    filteredTasks = _.sortBy(filteredTasks, task => parseInt(task.rank));
+    return filteredTasks;
+    // TODO Order for done task???
 }
 const _lon = [{level: 2, todo: TODO, headline: "foo", tags: {a: true, bar: true, c: true}, 
                project: "baz", rank: 4, fin: "<2018-8-28>"},
