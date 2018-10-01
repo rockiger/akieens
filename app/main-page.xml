@@ -42,12 +42,15 @@ https://docs.nativescript.org/ui/components.
             itemSwipeProgressEnded="onSwipeCellFinished"
             itemSwipeProgressStarted="onSwipeCellStarted" 
             itemSwipeProgressChanged="onSwipeCellProgressChanged"
-            itemSwiping="onItemSwiping" >
+            itemSwiping="onItemSwiping" 
+            itemReordered="onItemReordered"
+            itemReorder="true" 
+            >
             
             <lv:RadListView.itemTemplate>
                 <!-- background-color: white is necessary, otherwise the
                 itemSwipeTemplate shines through -->
-                <StackLayout class="list-group-item" style="background-color: white;" paddingLeft="5">
+                <StackLayout data-key="{{ key }}" data-rank="{{ rank }}" class="list-group-item" style="background-color: white;" paddingLeft="5">
                     <Label style="width: 100%" text="{{ headline }}" textWrap="true" class="title" />
                 </StackLayout>
             </lv:RadListView.itemTemplate>
