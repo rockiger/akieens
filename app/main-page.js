@@ -10,6 +10,7 @@ const utils = require("tns-core-modules/utils/utils");
 const atom = require("js-atom");
 const mainViewModel = require("./main-view-model");
 const db = require("./data/db.js");
+const rank = require("./data/rank.js");
 
 
 /*************
@@ -32,6 +33,24 @@ const $rightTresholdPassed$ = atom.createAtom(false, {validator: b => typeof(b) 
  * Functions *
  *************/
 
+function onItemReordered(args) {
+    const sourceIndex = args.index;
+    const targetIndex = args.data.targetIndex
+    const tasks = db.tasks();
+    const sourceTask = tasks[sourceIndex];
+    const targetTask = tasks[targetIndex];
+    if (sourceIndex > targetIndex) {
+        console.log("Moved up!")
+    } else {
+        console.log('Move down!');
+    }
+    console.log("Item reordered. Old index: " + sourceIndex + " " + "new index: " + targetIndex);
+    if (sourceTask.rank === targetTask.rank) {
+        return;
+    }
+    rank.moveRank(sourceTask, targetTask);
+}
+
 function onNavigatingTo(args) {
     /*
     This gets a reference this page’s <Page> UI component. You can
@@ -48,6 +67,7 @@ function onNavigatingTo(args) {
     db.switchListState(DOING);
     
     toolbar.on("selectedIndexChange", onselectedIndexChange);
+    PAGE = page;
 }
 
 
@@ -192,3 +212,4 @@ exports.onNavigatingFrom = onNavigatingFrom;
 exports.onSwipeCellStarted = onSwipeCellStarted;
 exports.onSwipeCellProgressChanged = onSwipeCellProgressChanged;
 exports.onSwipeCellFinished = onSwipeCellFinished;
+exports.onItemReordered = onItemReordered;

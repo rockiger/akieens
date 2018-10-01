@@ -61,7 +61,6 @@ function moveRank(sourceTask, targetTask) {
     // change the rank of the source task
     const newSourceTask = sourceTask;
     newSourceTask.rank = targetTask.rank;
-    console.log(newLon);
     newLon = _.map(newLon, x => {
         if(x.key === newSourceTask.key){
             return newSourceTask;

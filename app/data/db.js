@@ -18,6 +18,9 @@ exports.setNextTaskState = setNextTaskState;
 exports.setPrevTaskState = setPrevTaskState;
 exports.observeTaskList = observeTaskList;
 exports.unobserveTaskList = unobserveTaskList;
+exports.nodes = nodes;
+exports.resetTasks = resetTasks;
+
 
 
 /******************
@@ -120,6 +123,15 @@ function unobserveTaskList(key) {
  */
 function resetTasklist(pth) {
     return $taskList$.reset(node.lonFromFile); // TODO: use the path to load the file
+}
+
+/**
+ * Consumes a ListOfNode lon and replaces the curren $taskList$
+ * @param {ListOfNode} lon
+ * @returns {lon}
+ */
+function resetTasks(lon) {
+    return $taskList$.reset(lon);
 }
 
 /**
